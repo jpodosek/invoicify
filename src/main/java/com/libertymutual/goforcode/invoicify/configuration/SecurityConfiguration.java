@@ -9,8 +9,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import com.libertymutual.goforcode.invoicify.services.InvoicifyUserDetailsService;
+
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+	
+	private InvoicifyUserDetailsService userDetailsService;
+	
+	public SecurityConfiguration(InvoicifyUserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -23,36 +31,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/admin/**").hasRole("ADMIN") 	
 				.anyRequest().authenticated() //any request that comes through security pipeline has to be authenticated
 			.and()	
-			.formLogin();
-				//.loginPage("/login");									
+			.formLogin();							
 	}
 	
-	@Bean
+	@Override //beans are discoverable by spring
 	//allows spring to get usernames, passwords, and roles; fluent API
-	public UserDetailsService userDetailsService() {
-		
-		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-		UserDetails user = User
-				.withUsername("admin")
-				.password("admin")
-				.roles("ADMIN")
-				.build();
-		manager.createUser(user);
-		
-		user = User
-				.withUsername("clerk")
-				.password("clerk")
-				.roles("CLERK")
-				.build();
-		manager.createUser(user);
-		
-		user = User
-				.withUsername("accountant")
-				.password("accountant")
-				.roles("ACCOUNTANT")
-				.build();
-		manager.createUser(user);
-			
-		return manager;
+	//this is just an in memory service that overrides default spring behavior
+	public UserDetailsService userDetailsService() {	
+		return userDetailsService;
 	}
 }
