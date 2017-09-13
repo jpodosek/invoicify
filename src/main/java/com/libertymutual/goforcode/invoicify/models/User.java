@@ -27,10 +27,10 @@ public class User implements UserDetails {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique=true)
 	private String username;
 	
-	@Column(nullable = false, unique=true)
+	@Column(nullable = false)
 	private String password;
 	
 	@OneToMany(fetch=FetchType.EAGER, mappedBy="user", cascade=CascadeType.ALL) //cascade means any action to user, will flow down to associated entities
@@ -52,19 +52,19 @@ public class User implements UserDetails {
 //		this converts List<UserRole> into a List<String> ; a map converts 1 to 1
 //		List<String> roleNames = new ArrayList<String>();
 //		for (UserRole role: roles) {
-//			roleNames.add(role.getName());
+//			roleNames.add("ROLE_" + role.getName());
 //		}
 		
 		//"ROLE_" with spring, if you create a role, the granted authority needs to have ROLE_ in front of it
-				//so .antMatchers("/admin/**").hasRole("ADMIN") would need ROLE_ADMIN	
+				//so .antMatchers("/admin/**").hasRole("ADMIN") would become ROLE_ADMIN
 		
 		//Lambda same as loop above
 		List<String> roleNames = roles.stream()
 			.map(userRole -> "ROLE_" + userRole.getName())  // userRole is a variable name, represents individual user role in List<UserRole>
 			.collect(Collectors.toList()); 
 		
-		String authorityString = String.join(",", roleNames);
-		return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);		
+		String authorityString = String.join(",", roleNames); //turns into comma seperated list
+		return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);	
 		
 	}
 

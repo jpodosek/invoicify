@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="css/app.css"></script>
+<title>Sign Up </title>
+
+</head>
+<body>
+<h1>Sign Up</h1>
+<h2>{{ #errorMessage }} {{ errorMessage }} {{ /errorMessage }}</h2>
+
+<form method="post" action="/signup">
+	Username:<input type="text" name="username" required>
+	<br>
+	Password:<input type="password" name="password" required>
+	<br>
+	<input type="hidden" name="{{ _csrf.parameterName }}" value="{{ _csrf.token }}">
+	<button>Sign Up!</button>
+</form>
+
+</body>
+<script src="js/app.js"></script>
+
+</html>

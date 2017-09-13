@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import com.libertymutual.goforcode.invoicify.services.InvoicifyUserDetailsService;
@@ -16,6 +18,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	private InvoicifyUserDetailsService userDetailsService;
 	
+	//Looks up users
 	public SecurityConfiguration(InvoicifyUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
 	}
@@ -25,13 +28,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http
 			//.csrf().disable()
 			.authorizeRequests()
-				.antMatchers("/", "/css/**", "/js/**").permitAll()
+				.antMatchers("/", "/css/**", "/js/**", "/signup/**").permitAll()
 				.antMatchers("/invoices/**").hasAnyRole("ADMIN", "ACCOUNTANT")
 				.antMatchers("/billing-records/**").hasAnyRole("ADMIN", "CLERK")
 				.antMatchers("/admin/**").hasRole("ADMIN") 	
 				.anyRequest().authenticated() //any request that comes through security pipeline has to be authenticated
 			.and()	
 			.formLogin();							
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEndoder() {
+		return new BCryptPasswordEncoder();
 	}
 	
 	@Override //beans are discoverable by spring
