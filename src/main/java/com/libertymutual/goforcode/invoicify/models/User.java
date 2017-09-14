@@ -20,52 +20,55 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Table(name="invoicify_user")
+@Table(name = "invoicify_user")
 public class User implements UserDetails {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
-	@Column(nullable = false, unique=true)
+
+	@Column(nullable = false, unique = true)
 	private String username;
-	
+
 	@Column(nullable = false)
 	private String password;
-	
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="user", cascade=CascadeType.ALL) //cascade means any action to user, will flow down to associated entities
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL) // cascade means any action to
+																						// user, will flow down to
+																						// associated entities
 	private List<UserRole> roles;
-	
-	public User() {};
-	
+
+	public User() {
+	};
+
 	public User(String username, String password, String roleName) {
 		this.username = username;
 		this.password = password;
-		
 		roles = new ArrayList<UserRole>();
 		roles.add(new UserRole(roleName, this));
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-//		//granted authority spring uses to determine whether you can 
-//		this converts List<UserRole> into a List<String> ; a map converts 1 to 1
-//		List<String> roleNames = new ArrayList<String>();
-//		for (UserRole role: roles) {
-//			roleNames.add("ROLE_" + role.getName());
-//		}
-		
-		//"ROLE_" with spring, if you create a role, the granted authority needs to have ROLE_ in front of it
-				//so .antMatchers("/admin/**").hasRole("ADMIN") would become ROLE_ADMIN
-		
-		//Lambda same as loop above
-		List<String> roleNames = roles.stream()
-			.map(userRole -> "ROLE_" + userRole.getName())  // userRole is a variable name, represents individual user role in List<UserRole>
-			.collect(Collectors.toList()); 
-		
-		String authorityString = String.join(",", roleNames); //turns into comma seperated list
-		return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);	
-		
+		// this converts List<UserRole> into a List<String> ; a map converts 1 to 1
+		// List<String> roleNames = new ArrayList<String>();
+		// for (UserRole role: roles) {
+		// roleNames.add("ROLE_" + role.getName());
+		// }
+
+		// "ROLE_" with spring, if you create a role, the granted authority needs to
+		// have ROLE_ in front of it
+		// so .antMatchers("/admin/**").hasRole("ADMIN") would become ROLE_ADMIN
+
+		// Lambda same as loop above
+		List<String> roleNames = roles.stream().map(userRole -> "ROLE_" + userRole.getName()) // userRole is a variable
+																								// name, represents
+																								// individual user role
+																								// in List<UserRole>
+				.collect(Collectors.toList());
+
+		String authorityString = String.join(",", roleNames); // turns into comma seperated list
+		return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);
 	}
 
 	@Override
@@ -121,10 +124,5 @@ public class User implements UserDetails {
 	public void setUserRoles(List<UserRole> userRoles) {
 		this.roles = userRoles;
 	}
-	
-	
-	
-	
-	
-	
+
 }
